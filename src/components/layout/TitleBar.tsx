@@ -1,6 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Minus, Maximize2, Minimize2, X, Network } from "lucide-react";
+import { Minus, Maximize2, Minimize2, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import appIcon from "../../assets/image.png";
 
 export default function TitleBar() {
   const [isMaximized, setIsMaximized] = useState(false);
@@ -50,7 +51,7 @@ export default function TitleBar() {
           pointerEvents: "none",
         }}
       >
-        <Network size={14} />
+        <img src={appIcon} alt="NCP" style={{ width: "16px", height: "16px", objectFit: "contain" }} />
         <span>Network Control Panel</span>
       </div>
 
