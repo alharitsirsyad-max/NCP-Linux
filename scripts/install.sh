@@ -16,6 +16,7 @@ GITHUB_RELEASE_URL="https://github.com/${GITHUB_REPO}/releases/latest/download"
 INSTALL_DIR="${HOME}/.local/bin"
 DESKTOP_DIR="${HOME}/.local/share/applications"
 ICON_DIR="${HOME}/.local/share/icons/hicolor"
+ICON_PATH=""  # will be set by install_icon()
 
 # ── Colors ────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -152,38 +153,33 @@ install_app() {
 # ── Download icon ─────────────────────────────────────────────
 install_icon() {
     step "Installing icon"
-    mkdir -p "${ICON_DIR}/128x128/apps" "${ICON_DIR}/32x32/apps" "${ICON_DIR}/48x48/apps"
+    # Use absolute path in .desktop — lebih reliable dari icon name lookup
+    local ICON_DEST="${HOME}/.local/share/network.control.panel/icons/icon.png"
+    mkdir -p "$(dirname "$ICON_DEST")"
 
-    # Try multiple sources in order
-    local ICON_DEST="${ICON_DIR}/128x128/apps/${APP_NAME}.png"
-    local ICON_RELEASE="${GITHUB_RELEASE_URL}/icon-128x128.png"
     local ICON_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/main/src-tauri/icons/128x128.png"
+    local ICON_RELEASE="${GITHUB_RELEASE_URL}/icon-128x128.png"
 
-    if curl -fsSL --max-time 10 "$ICON_RELEASE" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
+    if curl -fsSL --max-time 15 "$ICON_RAW" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
+        success "Icon installed at ${ICON_DEST}"
+    elif curl -fsSL --max-time 15 "$ICON_RELEASE" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
         success "Icon installed from release"
-    elif curl -fsSL --max-time 10 "$ICON_RAW" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
-        success "Icon installed from source"
     else
-        warn "Could not download icon — creating placeholder"
+        warn "Could not download icon — app will show without icon"
+        ICON_DEST=""
     fi
 
-    # Refresh icon cache so launcher picks it up immediately
-    if command -v gtk-update-icon-cache &>/dev/null; then
-        gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
-    fi
-    if command -v update-desktop-database &>/dev/null; then
-        update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
-    fi
-    # XDG refresh for Plasma/GNOME
-    if command -v kbuildsycoca5 &>/dev/null; then
-        kbuildsycoca5 2>/dev/null || true
-    fi
+    # Store path for .desktop creation
+    ICON_PATH="$ICON_DEST"
 }
 
 # ── Create .desktop file ──────────────────────────────────────
 create_desktop_entry() {
     step "Creating desktop entry"
     mkdir -p "$DESKTOP_DIR"
+
+    # Use absolute icon path if available, else fallback to icon name
+    local ICON_VALUE="${ICON_PATH:-${APP_NAME}}"
 
     cat > "${DESKTOP_DIR}/${APP_NAME}.desktop" <<EOF
 [Desktop Entry]
@@ -193,7 +189,7 @@ Name=${APP_DISPLAY_NAME}
 GenericName=Network Manager
 Comment=Network configuration, monitoring, and diagnostics for Linux
 Exec=${INSTALL_DIR}/${APP_NAME}
-Icon=${APP_NAME}
+Icon=${ICON_VALUE}
 Terminal=false
 Categories=Network;System;Settings;
 Keywords=network;adapter;ip;dns;ping;traceroute;diagnostics;

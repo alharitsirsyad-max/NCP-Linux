@@ -1,5 +1,5 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Minus, Maximize2, Minimize2, X, Network } from "lucide-react";
+import { Maximize2, Minimize2, X, Network } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function TitleBar() {
@@ -18,7 +18,6 @@ export default function TitleBar() {
     };
   }, []);
 
-  const handleMinimize = () => getCurrentWindow().minimize();
   const handleMaximize = () => getCurrentWindow().toggleMaximize();
   const handleClose = () => getCurrentWindow().close();
 
@@ -56,9 +55,6 @@ export default function TitleBar() {
 
       {/* Right: window controls */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        <TitleBarButton onClick={handleMinimize} label="Minimize">
-          <Minus size={12} />
-        </TitleBarButton>
         <TitleBarButton onClick={handleMaximize} label="Maximize">
           {isMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
         </TitleBarButton>
