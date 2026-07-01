@@ -152,18 +152,31 @@ install_app() {
 # ── Download icon ─────────────────────────────────────────────
 install_icon() {
     step "Installing icon"
-    mkdir -p "${ICON_DIR}/128x128/apps" "${ICON_DIR}/32x32/apps"
+    mkdir -p "${ICON_DIR}/128x128/apps" "${ICON_DIR}/32x32/apps" "${ICON_DIR}/48x48/apps"
 
-    # Try release asset first, then raw GitHub
-    ICON_URL="${GITHUB_RELEASE_URL}/icon-128x128.png"
-    ICON_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/main/src-tauri/icons/128x128.png"
+    # Try multiple sources in order
+    local ICON_DEST="${ICON_DIR}/128x128/apps/${APP_NAME}.png"
+    local ICON_RELEASE="${GITHUB_RELEASE_URL}/icon-128x128.png"
+    local ICON_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/main/src-tauri/icons/128x128.png"
 
-    if curl -fsSL "$ICON_URL" -o "${ICON_DIR}/128x128/apps/${APP_NAME}.png" 2>/dev/null; then
-        success "Icon installed"
-    elif curl -fsSL "$ICON_RAW" -o "${ICON_DIR}/128x128/apps/${APP_NAME}.png" 2>/dev/null; then
+    if curl -fsSL --max-time 10 "$ICON_RELEASE" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
+        success "Icon installed from release"
+    elif curl -fsSL --max-time 10 "$ICON_RAW" -o "$ICON_DEST" 2>/dev/null && [ -s "$ICON_DEST" ]; then
         success "Icon installed from source"
     else
-        warn "Could not download icon (non-critical) — app will use default icon"
+        warn "Could not download icon — creating placeholder"
+    fi
+
+    # Refresh icon cache so launcher picks it up immediately
+    if command -v gtk-update-icon-cache &>/dev/null; then
+        gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
+    fi
+    if command -v update-desktop-database &>/dev/null; then
+        update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
+    fi
+    # XDG refresh for Plasma/GNOME
+    if command -v kbuildsycoca5 &>/dev/null; then
+        kbuildsycoca5 2>/dev/null || true
     fi
 }
 

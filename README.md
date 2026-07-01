@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/assets/image.png" alt="Network Control Panel" width="96" />
+  <img src="src/assets/ncp.png" alt="Network Control Panel" width="96" />
   <h1>Network Control Panel</h1>
   <p>Linux desktop app for network configuration, monitoring, and diagnostics.</p>
   <p>Built with <strong>Tauri v2</strong> + <strong>React</strong> + <strong>TypeScript</strong> · Inspired by Windows Network Connections</p>
