@@ -153,10 +153,18 @@ install_app() {
 install_icon() {
     step "Installing icon"
     mkdir -p "${ICON_DIR}/128x128/apps" "${ICON_DIR}/32x32/apps"
+
+    # Try release asset first, then raw GitHub
     ICON_URL="${GITHUB_RELEASE_URL}/icon-128x128.png"
-    curl -fsSL "$ICON_URL" -o "${ICON_DIR}/128x128/apps/${APP_NAME}.png" 2>/dev/null \
-        && success "Icon installed" \
-        || warn "Could not download icon (non-critical)"
+    ICON_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/main/src-tauri/icons/128x128.png"
+
+    if curl -fsSL "$ICON_URL" -o "${ICON_DIR}/128x128/apps/${APP_NAME}.png" 2>/dev/null; then
+        success "Icon installed"
+    elif curl -fsSL "$ICON_RAW" -o "${ICON_DIR}/128x128/apps/${APP_NAME}.png" 2>/dev/null; then
+        success "Icon installed from source"
+    else
+        warn "Could not download icon (non-critical) — app will use default icon"
+    fi
 }
 
 # ── Create .desktop file ──────────────────────────────────────
