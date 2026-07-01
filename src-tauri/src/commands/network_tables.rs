@@ -344,18 +344,6 @@ fn which_exists(binary: &str) -> bool {
         .unwrap_or(false)
 }
 
-#[tauri::command]
-pub fn open_nm_connection_editor(iface: String) -> Result<(), String> {
-    if !which_exists("nm-connection-editor") {
-        return Err("nm-connection-editor not found. Install network-manager-applet.".to_string());
-    }
-    std::process::Command::new("nm-connection-editor")
-        .args(["--type=802-3-ethernet", "--edit", &iface])
-        .spawn()
-        .map_err(|e| format!("Failed to launch nm-connection-editor: {}", e))?;
-    Ok(())
-}
-
 // ── Unit tests for ss parser ─────────────────────────────────────────────────
 
 #[cfg(test)]

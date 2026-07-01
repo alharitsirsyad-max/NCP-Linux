@@ -6,7 +6,7 @@ use commands::diagnostics::{run_ping, run_dns_lookup, run_traceroute, get_system
 use commands::network_tables::{
     get_routing_table, get_arp_table, get_open_ports,
     get_traffic_snapshot, check_internet, get_uptime,
-    open_terminal, launch_wireshark, open_nm_connection_editor,
+    open_terminal, launch_wireshark,
     ssh_connect, lookup_mac_vendor, save_report,
     launch_winbox, launch_packet_tracer,
 };
@@ -40,7 +40,6 @@ pub fn run() {
             get_uptime,
             open_terminal,
             launch_wireshark,
-            open_nm_connection_editor,
             ssh_connect,
             lookup_mac_vendor,
             save_report,

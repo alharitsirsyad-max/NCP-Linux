@@ -707,7 +707,6 @@ Semua command terdaftar dan dipanggil via Tauri IPC `invoke()`:
 | `save_report` | Tulis file ke `~/Downloads/` atau `~/Documents/` |
 | `launch_winbox` | Jalankan WinBox binary dari path yang dikonfigurasi |
 | `launch_packet_tracer` | Jalankan Cisco PT binary dari path yang dikonfigurasi |
-| `open_nm_connection_editor` | `nm-connection-editor` untuk edit koneksi advanced |
 | `run_nmcli_command` | Generic nmcli wrapper (connection/device/radio/networking) |
 
 ---
