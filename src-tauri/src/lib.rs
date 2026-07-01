@@ -1,0 +1,52 @@
+mod models;
+mod commands;
+
+use commands::adapter::{list_adapters, enable_adapter, disable_adapter, renew_dhcp, run_nmcli_command, get_ipv4_config, apply_ipv4_config, get_ipv6_config, apply_ipv6_config, apply_dns_config};
+use commands::diagnostics::{run_ping, run_dns_lookup, run_traceroute, get_system_info, run_mtr, run_whois};
+use commands::network_tables::{
+    get_routing_table, get_arp_table, get_open_ports,
+    get_traffic_snapshot, check_internet, get_uptime,
+    open_terminal, launch_wireshark, open_nm_connection_editor,
+    ssh_connect, lookup_mac_vendor, save_report,
+    launch_winbox, launch_packet_tracer,
+};
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![
+            list_adapters,
+            enable_adapter,
+            disable_adapter,
+            renew_dhcp,
+            run_nmcli_command,
+            get_ipv4_config,
+            apply_ipv4_config,
+            get_ipv6_config,
+            apply_ipv6_config,
+            apply_dns_config,
+            run_ping,
+            run_dns_lookup,
+            run_traceroute,
+            get_system_info,
+            run_mtr,
+            run_whois,
+            get_routing_table,
+            get_arp_table,
+            get_open_ports,
+            get_traffic_snapshot,
+            check_internet,
+            get_uptime,
+            open_terminal,
+            launch_wireshark,
+            open_nm_connection_editor,
+            ssh_connect,
+            lookup_mac_vendor,
+            save_report,
+            launch_winbox,
+            launch_packet_tracer,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

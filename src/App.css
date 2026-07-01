@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Form element reset */
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+}
+
+/* Select — Microsoft style: white bg, sharp border, dark text */
+select {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #c8c8c8;
+  border-radius: 2px;
+  padding: 4px 6px;
+  cursor: pointer;
+  appearance: auto;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Input focus ring — Microsoft blue */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #0067b8;
+  outline-offset: -1px;
+}
+
+/* Scrollbar — light, thin */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+::-webkit-scrollbar-thumb {
+  background: #c8c8c8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}

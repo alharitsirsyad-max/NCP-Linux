@@ -1,0 +1,48 @@
+:root {
+  /* ── Microsoft Fluent / Windows 11 Light ─────────────────────────── */
+
+  /* Surfaces */
+  --surface-0: #ffffff;   /* page background */
+  --surface-1: #ffffff;   /* content areas, cards */
+  --surface-2: #f2f2f2;   /* toolbar, sidebar, menubar, footer bands */
+  --surface-3: #e8e8e8;   /* input background, hover, alternate rows */
+
+  /* Border */
+  --border: #e0e0e0;
+  --border-strong: #c8c8c8;
+
+  /* Text */
+  --text-primary: #000000;       /* void — headings, body */
+  --text-secondary: #262626;     /* charcoal — body copy, labels */
+  --text-muted: #616161;         /* slate — secondary nav, captions */
+
+  /* Accent — Microsoft / Fluent blue */
+  --accent: #0067b8;             /* microsoft blue — all interactive */
+  --accent-hover: #004a7f;       /* deep azure — hover/active states */
+  --on-accent: #ffffff;
+
+  /* Semantic */
+  --color-success: #107c10;
+  --color-warning: #9d5d00;
+  --color-error:   #c42b1c;
+  --color-info:    #0067c0;
+
+  /* Radius — Microsoft style: 0px cards, 2px inputs/buttons */
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+
+  /* Shadow — Microsoft dual-layer card shadow */
+  --shadow-card: rgba(0, 0, 0, 0.13) 0px 3px 7px 0px, rgba(0, 0, 0, 0.11) 0px 1px 2px 0px;
+
+  /* Font */
+  --font-sans: 'Segoe UI', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-mono: 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  /* Layout */
+  --sidebar-width: 210px;
+  --titlebar-height: 32px;
+  --menubar-height: 28px;
+  --toolbar-height: 38px;
+  --statusbar-height: 24px;
+}
