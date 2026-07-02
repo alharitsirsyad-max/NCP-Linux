@@ -10,7 +10,8 @@ export type SelectedPage =
   | "settings"
   | "ssh"
   | "speedtest"
-  | "lan_scanner";
+  | "lan_scanner"
+  | "dns_benchmark";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 

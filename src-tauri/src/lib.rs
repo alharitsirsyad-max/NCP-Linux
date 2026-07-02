@@ -3,6 +3,7 @@ mod commands;
 
 use commands::adapter::{list_adapters, enable_adapter, disable_adapter, renew_dhcp, run_nmcli_command, get_ipv4_config, apply_ipv4_config, get_ipv6_config, apply_ipv6_config, apply_dns_config};
 use commands::diagnostics::{run_ping, run_dns_lookup, run_traceroute, get_system_info, run_mtr, run_whois};
+use commands::dns_benchmark::{get_isp_dns, run_dns_benchmark, get_default_dns_servers};
 use commands::lan_scanner::{check_nmap_available, get_local_networks, run_lan_scan, cancel_lan_scan};
 use commands::speedtest::{check_speedtest_available, run_speedtest};
 use commands::network_tables::{
@@ -53,6 +54,9 @@ pub fn run() {
             get_local_networks,
             run_lan_scan,
             cancel_lan_scan,
+            get_isp_dns,
+            run_dns_benchmark,
+            get_default_dns_servers,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

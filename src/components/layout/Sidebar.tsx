@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Wifi, Monitor, Shield, Container,
   Stethoscope, Route, Table, DoorOpen,
-  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch,
+  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch, BarChart2,
 } from "lucide-react";
 import { useAdapters } from "../../hooks/useAdapters";
 import { mockAdapters } from "../../mock/adapters";
@@ -89,6 +89,7 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "ssh",          icon: <Terminal size={14} />,     label: "SSH Connect" },
   { id: "speedtest",    icon: <Zap size={14} />,          label: "Speed Test" },
   { id: "lan_scanner",  icon: <ScanSearch size={14} />,   label: "LAN Scanner" },
+  { id: "dns_benchmark", icon: <BarChart2 size={14} />,   label: "DNS Benchmark" },
   { id: "settings",     icon: <Settings size={14} />,     label: "Settings" },
 ];
 
