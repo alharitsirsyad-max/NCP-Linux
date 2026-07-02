@@ -429,9 +429,37 @@ Otomatis lookup vendor dari prefix MAC menggunakan database `/usr/share/wireshar
 
 ---
 
-## 16. SSH Quick Connect
+## 16. Speed Test
 
-**Lokasi:** Sidebar → SSH Connect
+**Lokasi:** Sidebar → Speed Test
+
+Mengukur kecepatan internet menggunakan `speedtest-cli`.
+
+### Tampilan
+- Tiga gauge: **Ping** (ms), **Download** (Mbps), **Upload** (Mbps)
+- Progress bar dengan warna per stage: oranye=ping, biru=download, hijau=upload
+- Info server dan ISP muncul setelah test selesai
+- "Last result" bar di bawah menampilkan hasil terakhir dengan timestamp
+
+### Kontrol
+- **START TEST** → mulai test, tombol berubah jadi **STOP** (merah)
+- **STOP** → hentikan proses, kembali ke idle
+
+### Animasi
+- Angka pada gauge naik secara counter animation saat hasil tiba
+- Border gauge pulse saat stage sedang aktif
+- Progress bar smooth CSS transition
+
+### Fallback
+- Jika `speedtest-cli` tidak terinstall → tampilkan instruksi install per distro
+
+**Command:** `speedtest-cli --json --secure`
+
+> Install: `sudo pacman -S speedtest-cli` (Arch) atau `sudo apt install speedtest-cli` (Ubuntu)
+
+---
+
+## 17. SSH Quick Connect**Lokasi:** Sidebar → SSH Connect
 
 ### Quick Connect
 Form cepat: `user @ host : port` → tombol **Connect**
@@ -707,6 +735,8 @@ Semua command terdaftar dan dipanggil via Tauri IPC `invoke()`:
 | `save_report` | Tulis file ke `~/Downloads/` atau `~/Documents/` |
 | `launch_winbox` | Jalankan WinBox binary dari path yang dikonfigurasi |
 | `launch_packet_tracer` | Jalankan Cisco PT binary dari path yang dikonfigurasi |
+| `check_speedtest_available` | Cek apakah `speedtest-cli` tersedia di sistem |
+| `run_speedtest` | Jalankan speed test via `speedtest-cli --json`, streaming progress events |
 | `run_nmcli_command` | Generic nmcli wrapper (connection/device/radio/networking) |
 
 ---

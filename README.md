@@ -42,6 +42,7 @@ Otomatis install semua dependencies + aplikasi + membuat shortcut di app launche
 | **ARP Table** | ARP cache with color-coded state + MAC vendor lookup |
 | **Open Ports** | `ss -tulnp` output with TCP/UDP and listening-only filters |
 | **SSH Quick Connect** | Saved hosts, recent connections, quick connect — opens in terminal emulator |
+| **Speed Test** | Internet speed test via `speedtest-cli` — ping, download, upload dengan gauge realtime |
 | **Bandwidth Graph** | 60-second realtime canvas chart per interface |
 | **Context Menu** | Right-click adapter: Copy IP/MAC/DNS, Ping, Traceroute, Enable/Disable, Open Terminal |
 | **Status Bar** | Realtime download/upload speed, uptime, internet status |
@@ -100,6 +101,7 @@ The app uses standard Linux CLI tools — install them if not present:
 | `mtr` | `mtr` | `mtr-tiny` | MTR diagnostics |
 | `whois` | `whois` | `whois` | Whois lookup |
 | `ss` | `iproute2` | `iproute2` | Open ports |
+| `speedtest-cli` | `speedtest-cli` | `speedtest-cli` | Speed test |
 
 ---
 
