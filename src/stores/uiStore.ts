@@ -11,7 +11,8 @@ export type SelectedPage =
   | "ssh"
   | "speedtest"
   | "lan_scanner"
-  | "dns_benchmark";
+  | "dns_benchmark"
+  | "wol";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 

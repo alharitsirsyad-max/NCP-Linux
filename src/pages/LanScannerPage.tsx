@@ -9,6 +9,7 @@ import {
   Wifi,
   Download,
   RefreshCw,
+  Power,
 } from "lucide-react";
 import { useLanScanner, type LanDevice } from "../hooks/useLanScanner";
 import { useUIStore } from "../stores/uiStore";
@@ -64,6 +65,16 @@ function DeviceContextMenu({
     onClose();
   }
 
+  function addToWol() {
+    // Navigate to WoL page — the page will handle pre-fill via uiStore state
+    // We use sessionStorage as a lightweight cross-page signal
+    if (device.mac) {
+      sessionStorage.setItem("wol_prefill_mac", device.mac);
+    }
+    setSelectedPage("wol");
+    onClose();
+  }
+
   const items: { label: string; icon: React.ReactNode; onClick: () => void; disabled?: boolean }[] = [
     {
       label: "Copy IP",
@@ -87,6 +98,13 @@ function DeviceContextMenu({
       label: "SSH to device",
       icon: <Terminal size={12} />,
       onClick: sshDevice,
+    },
+    { label: "─", icon: null, onClick: () => {} },
+    {
+      label: "Add to Wake-on-LAN",
+      icon: <Power size={12} />,
+      onClick: addToWol,
+      disabled: !device.mac,
     },
   ];
 
