@@ -16,6 +16,7 @@ import PortsPage from "../../pages/PortsPage";
 import SettingsPage from "../../pages/SettingsPage";
 import SSHPage from "../../pages/SSHPage";
 import SpeedTestPage from "../../pages/SpeedTestPage";
+import LanScannerPage from "../../pages/LanScannerPage";
 import ComingSoonPage from "../shared/ComingSoonPage";
 
 function PageContent() {
@@ -31,6 +32,7 @@ function PageContent() {
     case "settings":    return <SettingsPage />;
     case "ssh":         return <SSHPage />;
     case "speedtest":   return <SpeedTestPage />;
+    case "lan_scanner": return <LanScannerPage />;
     default:            return <ComingSoonPage pageName={selectedPage} />;
   }
 }
