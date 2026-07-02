@@ -8,7 +8,8 @@ export type SelectedPage =
   | "ports"
   | "dashboard"
   | "settings"
-  | "ssh";
+  | "ssh"
+  | "speedtest";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 

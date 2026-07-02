@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Wifi, Monitor, Shield, Container,
   Stethoscope, Route, Table, DoorOpen,
-  Loader, AlertCircle, Network, Settings, Terminal,
+  Loader, AlertCircle, Network, Settings, Terminal, Zap,
 } from "lucide-react";
 import { useAdapters } from "../../hooks/useAdapters";
 import { mockAdapters } from "../../mock/adapters";
@@ -87,6 +87,7 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "arp",         icon: <Table size={14} />,        label: "ARP Table" },
   { id: "ports",       icon: <DoorOpen size={14} />,     label: "Open Ports" },
   { id: "ssh",         icon: <Terminal size={14} />,     label: "SSH Connect" },
+  { id: "speedtest",   icon: <Zap size={14} />,          label: "Speed Test" },
   { id: "settings",    icon: <Settings size={14} />,     label: "Settings" },
 ];
 

@@ -60,3 +60,22 @@ pub struct PortEntry {
     pub pid: Option<u32>,
     pub process: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SpeedTestResult {
+    pub ping: f64,
+    pub download: f64,      // Mbps
+    pub upload: f64,        // Mbps
+    pub server_name: String,
+    pub server_country: String,
+    pub isp: String,
+    pub timestamp: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct SpeedTestProgress {
+    pub stage: String,               // "ping" | "download" | "upload" | "done" | "error"
+    pub percent: u8,                 // 0-100
+    pub current_value: Option<f64>,
+    pub message: String,
+}
