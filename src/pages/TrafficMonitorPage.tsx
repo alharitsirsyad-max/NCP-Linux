@@ -39,8 +39,8 @@ export default function TrafficMonitorPage() {
   const [totalTx, setTotalTx] = useState(0);
   const [sessionRx, setSessionRx] = useState(0);
   const [sessionTx, setSessionTx] = useState(0);
-  const [baselineRx, setBaselineRx] = useState<number | null>(null);
-  const [baselineTx, setBaselineTx] = useState<number | null>(null);
+  const [, setBaselineRx] = useState<number | null>(null);
+  const [, setBaselineTx] = useState<number | null>(null);
 
   const unlistenRef = useRef<UnlistenFn | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);

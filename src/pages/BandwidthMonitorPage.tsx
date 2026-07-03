@@ -29,12 +29,6 @@ function fmtKbps(kbps: number): string {
   return `${(kbps * 1024).toFixed(0)} B/s`;
 }
 
-function fmtKb(kb: number): string {
-  if (kb >= 1_048_576) return `${(kb / 1_048_576).toFixed(1)} GB`;
-  if (kb >= 1_024)     return `${(kb / 1_024).toFixed(1)} MB`;
-  return `${kb.toFixed(0)} KB`;
-}
-
 // ─── Bar ─────────────────────────────────────────────────────────────────────
 
 function BwBar({ value, max, color }: { value: number; max: number; color: string }) {
