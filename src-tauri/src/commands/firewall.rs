@@ -230,9 +230,9 @@ fn parse_ufw_rules_numbered(output: &str) -> Vec<UfwRule> {
 
         let rest = line[close + 1..].trim();
 
-        // Split into columns by 2+ spaces
+        // Split into columns by 2+ spaces (UFW output column widths vary)
         let cols: Vec<&str> = rest
-            .split("   ")
+            .split("  ")
             .map(|s| s.trim())
             .filter(|s| !s.is_empty())
             .collect();

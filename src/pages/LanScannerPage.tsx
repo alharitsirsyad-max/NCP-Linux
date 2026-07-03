@@ -444,9 +444,10 @@ export default function LanScannerPage() {
           )}
         </button>
 
-        {/* Refresh networks */}
+        {/* Refresh networks — resets scan state and re-fetches network list
+            without reloading the entire Tauri webview. */}
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => scanner.reset()}
           disabled={isRunning}
           title="Refresh network list"
           style={{

@@ -108,22 +108,25 @@ export default function TrafficMonitorPage() {
       setTotalRx(update.total_rx_bytes);
       setTotalTx(update.total_tx_bytes);
 
-      // Session bytes = current total minus baseline (set on first update)
-      setBaselineRx((prev) => {
-        if (prev === null) { setBaselineTx(update.total_tx_bytes); return update.total_rx_bytes; }
-        return prev;
-      });
+      // Session bytes = current total minus baseline (set on first update).
+      // Use a single combined updater to avoid reading stale state across
+      // two separate setBaselineRx calls (React batches state updates but
+      // functional updaters for *different* state atoms still close over
+      // the same render's snapshot, so chaining two setBaselineRx calls
+      // caused the second one to see the pre-update value of baselineTx).
       setBaselineRx((prevRx) => {
+        const newBaselineRx = prevRx === null ? update.total_rx_bytes : prevRx;
         if (prevRx !== null) {
-          setSessionRx(Math.max(0, update.total_rx_bytes - prevRx));
+          setSessionRx(Math.max(0, update.total_rx_bytes - newBaselineRx));
         }
-        return prevRx;
+        return newBaselineRx;
       });
       setBaselineTx((prevTx) => {
+        const newBaselineTx = prevTx === null ? update.total_tx_bytes : prevTx;
         if (prevTx !== null) {
-          setSessionTx(Math.max(0, update.total_tx_bytes - prevTx));
+          setSessionTx(Math.max(0, update.total_tx_bytes - newBaselineTx));
         }
-        return prevTx;
+        return newBaselineTx;
       });
     });
 

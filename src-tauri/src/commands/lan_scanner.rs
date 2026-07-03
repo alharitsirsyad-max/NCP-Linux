@@ -304,7 +304,8 @@ fn parse_host_xml(xml: &str) -> Option<LanDevice> {
                     return Some(tag_str[vs..vs + ve].to_string());
                 }
             }
-            search_from = abs + 1;
+            // Advance past this tag to avoid re-matching the same position
+            search_from = abs + tag_end + 1;
         }
         None
     }

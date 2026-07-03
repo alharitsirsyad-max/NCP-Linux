@@ -103,7 +103,7 @@ pub async fn start_capture(
             .args(["-n", "tcpdump"])
             .args(&args)
             .stdout(std::process::Stdio::null())
-            .stderr(std::process::Stdio::null())
+            .stderr(std::process::Stdio::piped())
             .spawn()
         {
             Ok(c) => c,
@@ -120,6 +120,36 @@ pub async fn start_capture(
                 return;
             }
         };
+
+        // Spawn a task to drain stderr so the child doesn't block on a full pipe,
+        // and capture the first error line to emit if tcpdump exits immediately.
+        let stderr_lines = {
+            let stderr = child.stderr.take();
+            if let Some(s) = stderr {
+                use tokio::io::AsyncBufReadExt;
+                let mut reader = tokio::io::BufReader::new(s).lines();
+                let app_err = app_clone.clone();
+                tokio::spawn(async move {
+                    // Read lines; if tcpdump errors (e.g. sudo password required), emit it
+                    while let Ok(Some(line)) = reader.next_line().await {
+                        let line = line.trim().to_string();
+                        if !line.is_empty() {
+                            let _ = app_err.emit(
+                                "capture_progress",
+                                CaptureProgress {
+                                    packets_captured: 0,
+                                    file_size_bytes: 0,
+                                    message: format!("tcpdump: {}", line),
+                                },
+                            );
+                        }
+                    }
+                })
+            } else {
+                tokio::spawn(async {})
+            }
+        };
+        let _ = stderr_lines;
 
         // Progress ticker: poll file size every second
         let mut ticker = interval(Duration::from_secs(1));

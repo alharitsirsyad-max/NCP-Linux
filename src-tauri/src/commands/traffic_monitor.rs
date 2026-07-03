@@ -104,7 +104,7 @@ pub async fn start_traffic_monitor(
                 point: TrafficPoint {
                     timestamp: now_ms,
                     rx_bytes_per_sec: rx_per_sec,
-                    tx_bytes_per_sec: tx_ps(rx_per_sec, tx_per_sec),
+                    tx_bytes_per_sec: tx_per_sec,
                 },
                 total_rx_bytes: rx_bytes,
                 total_tx_bytes: tx_bytes,
@@ -116,9 +116,6 @@ pub async fn start_traffic_monitor(
 
     Ok(())
 }
-
-// small helper to avoid confusing closures
-fn tx_ps(_rx: f64, tx: f64) -> f64 { tx }
 
 /// Return stored history for an interface.
 /// `duration_seconds` limits how many data points are returned (most recent).

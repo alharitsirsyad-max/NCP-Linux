@@ -99,6 +99,18 @@ export default function PacketCapturePage() {
     if (timerRef.current) clearInterval(timerRef.current);
   }
 
+  const handleStop = useCallback(async () => {
+    cleanup();
+    try {
+      const path = await invoke<string>("stop_capture");
+      setLastOutputPath(path || null);
+    } catch {
+      // ignore
+    }
+    setStatus("done");
+    setRemaining(null);
+  }, []);
+
   const handleStart = useCallback(async () => {
     setError(null);
     setProgress(null);
@@ -133,7 +145,7 @@ export default function PacketCapturePage() {
       timerRef.current = setInterval(() => {
         setRemaining((prev) => {
           if (prev === null || prev <= 1) {
-            // time up — stop
+            // time up — stop capture
             handleStop();
             return null;
           }
@@ -150,19 +162,7 @@ export default function PacketCapturePage() {
       setStatus("error");
       cleanup();
     }
-  }, [selectedIface, filter, outputPath, stopMode, stopPackets, stopSeconds]);
-
-  const handleStop = useCallback(async () => {
-    cleanup();
-    try {
-      const path = await invoke<string>("stop_capture");
-      setLastOutputPath(path || null);
-    } catch {
-      // ignore
-    }
-    setStatus("done");
-    setRemaining(null);
-  }, []);
+  }, [selectedIface, filter, outputPath, stopMode, stopPackets, stopSeconds, handleStop]);
 
   async function handleOpenWireshark() {
     if (!lastOutputPath) return;
