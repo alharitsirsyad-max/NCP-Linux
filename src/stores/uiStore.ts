@@ -14,7 +14,8 @@ export type SelectedPage =
   | "dns_benchmark"
   | "wol"
   | "wifi_analyzer"
-  | "traffic_monitor";
+  | "traffic_monitor"
+  | "vlan";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 

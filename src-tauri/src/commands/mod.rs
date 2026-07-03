@@ -5,5 +5,6 @@ pub mod lan_scanner;
 pub mod network_tables;
 pub mod speedtest;
 pub mod traffic_monitor;
+pub mod vlan;
 pub mod wifi_analyzer;
 pub mod wol;

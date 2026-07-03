@@ -6,6 +6,7 @@ use commands::diagnostics::{run_ping, run_dns_lookup, run_traceroute, get_system
 use commands::wol::{send_wol, save_wol_targets, load_wol_targets, validate_mac};
 use commands::wifi_analyzer::{scan_wifi_networks, check_wifi_available};
 use commands::traffic_monitor::{start_traffic_monitor, get_traffic_history, stop_traffic_monitor, list_traffic_interfaces};
+use commands::vlan::get_vlan_info;
 use commands::dns_benchmark::{get_isp_dns, run_dns_benchmark, get_default_dns_servers};
 use commands::lan_scanner::{check_nmap_available, get_local_networks, run_lan_scan, cancel_lan_scan};
 use commands::speedtest::{check_speedtest_available, run_speedtest};
@@ -70,6 +71,7 @@ pub fn run() {
             get_traffic_history,
             stop_traffic_monitor,
             list_traffic_interfaces,
+            get_vlan_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
