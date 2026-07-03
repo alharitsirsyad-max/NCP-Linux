@@ -353,14 +353,6 @@ export default function WolPage() {
     }
   }, []);
 
-  // If parent pre-fills a MAC (from LAN Scanner context menu)
-  useEffect(() => {
-    if (prefillMac) {
-      setAddInitialMac(prefillMac);
-      setShowAddModal(true);
-    }
-  }, [prefillMac]);
-
   async function persistTargets(updated: WolTarget[]) {
     setTargets(updated);
     await invoke("save_wol_targets", { targets: updated }).catch(() => {});
