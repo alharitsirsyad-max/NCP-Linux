@@ -91,6 +91,7 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "lan_scanner",   icon: <ScanSearch size={14} />,  label: "LAN Scanner" },
   { id: "dns_benchmark", icon: <BarChart2 size={14} />,   label: "DNS Benchmark" },
   { id: "wol",           icon: <PowerOff size={14} />,    label: "Wake-on-LAN" },
+  { id: "wifi_analyzer", icon: <Wifi size={14} />,        label: "Wi-Fi Analyzer" },
   { id: "settings",      icon: <Settings size={14} />,    label: "Settings" },
 ];
 

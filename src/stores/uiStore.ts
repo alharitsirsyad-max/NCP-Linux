@@ -12,7 +12,8 @@ export type SelectedPage =
   | "speedtest"
   | "lan_scanner"
   | "dns_benchmark"
-  | "wol";
+  | "wol"
+  | "wifi_analyzer";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 
