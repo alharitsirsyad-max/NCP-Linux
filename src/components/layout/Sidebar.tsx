@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Wifi, Monitor, Shield, Container,
   Stethoscope, Route, Table, DoorOpen,
-  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch, BarChart2, PowerOff, Activity,
+  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch, BarChart2, PowerOff, Activity, Radio,
 } from "lucide-react";
 import { useAdapters } from "../../hooks/useAdapters";
 import { mockAdapters } from "../../mock/adapters";
@@ -94,6 +94,7 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "wifi_analyzer",   icon: <Wifi size={14} />,        label: "Wi-Fi Analyzer" },
   { id: "traffic_monitor", icon: <Activity size={14} />,    label: "Traffic Monitor" },
   { id: "vlan",            icon: <Network size={14} />,     label: "VLAN Info" },
+  { id: "packet_capture",  icon: <Radio size={14} />,       label: "Packet Capture" },
   { id: "settings",        icon: <Settings size={14} />,    label: "Settings" },
 ];
 

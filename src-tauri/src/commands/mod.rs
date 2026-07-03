@@ -3,6 +3,7 @@ pub mod diagnostics;
 pub mod dns_benchmark;
 pub mod lan_scanner;
 pub mod network_tables;
+pub mod packet_capture;
 pub mod speedtest;
 pub mod traffic_monitor;
 pub mod vlan;
