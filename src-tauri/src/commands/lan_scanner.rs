@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::Emitter;
-use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -174,78 +172,56 @@ pub async fn run_lan_scan(
 ) -> Result<Vec<LanDevice>, String> {
     SCAN_CANCEL.store(false, Ordering::Relaxed);
 
-    // Try with sudo first (gives MAC/vendor), fallback without
     let use_sudo = sudo_available().await;
-
-    let mut child = build_nmap_command(&network, use_sudo)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .map_err(|e| format!("Failed to start nmap: {}", e))?;
-
-    let stdout = child.stdout.take().ok_or("No stdout")?;
-    let mut reader = BufReader::new(stdout).lines();
-
-    let mut xml_buf = String::new();
-    let mut devices: Vec<LanDevice> = Vec::new();
-    let mut devices_found: u32 = 0;
-
-    // Progress ticker: nmap doesn't output per-device until done.
-    // We do a best-effort incremental progress while reading XML chunks.
-    let mut percent: u8 = 5;
 
     // Emit initial progress
     let _ = app.emit(
         "lan_scan_progress",
         LanScanProgress {
             devices_found: 0,
-            percent,
+            percent: 5,
             message: format!("Scanning {}...", network),
         },
     );
 
-    while let Ok(Some(line)) = reader.next_line().await {
-        if SCAN_CANCEL.load(Ordering::Relaxed) {
-            let _ = child.kill().await;
-            break;
-        }
-
-        xml_buf.push_str(&line);
-        xml_buf.push('\n');
-
-        // Try to parse each <host ...>...</host> block as it arrives
-        while let Some(device) = try_extract_host(&xml_buf) {
-            devices_found += 1;
-            devices.push(device.clone());
-
-            // Bump progress estimate (cap at 95 until done)
-            percent = percent.saturating_add(3).min(95);
-
-            let _ = app.emit(
+    // Spawn a progress ticker task while nmap runs
+    let app_clone = app.clone();
+    let network_clone = network.clone();
+    let ticker = tokio::spawn(async move {
+        let mut pct: u8 = 10;
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+            if SCAN_CANCEL.load(Ordering::Relaxed) { break; }
+            pct = pct.saturating_add(5).min(90);
+            let _ = app_clone.emit(
                 "lan_scan_progress",
                 LanScanProgress {
-                    devices_found,
-                    percent,
-                    message: format!(
-                        "Found {} device(s), scanning {}...",
-                        devices_found, network
-                    ),
+                    devices_found: 0,
+                    percent: pct,
+                    message: format!("Scanning {}...", network_clone),
                 },
             );
-            let _ = app.emit("lan_device_found", device);
-
-            // Remove the consumed host block from buffer
-            if let Some(end) = xml_buf.find("</host>") {
-                xml_buf = xml_buf[end + "</host>".len()..].to_string();
-            } else {
-                break;
-            }
         }
+    });
+
+    // Run nmap and collect full output
+    let output = build_nmap_command(&network, use_sudo)
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run nmap: {}", e))?;
+
+    ticker.abort();
+
+    let xml = String::from_utf8_lossy(&output.stdout).to_string();
+    let devices = parse_nmap_xml(&xml);
+
+    // Emit each device found
+    for device in &devices {
+        let _ = app.emit("lan_device_found", device);
     }
 
-    let _ = child.wait().await;
+    let devices_found = devices.len() as u32;
 
-    // Final progress
     let _ = app.emit(
         "lan_scan_progress",
         LanScanProgress {
@@ -288,30 +264,29 @@ fn build_nmap_command(network: &str, with_sudo: bool) -> tokio::process::Command
     }
 }
 
-/// Try to extract one complete `<host>…</host>` block from the XML buffer
-/// and parse it into a `LanDevice`.
-fn try_extract_host(xml: &str) -> Option<LanDevice> {
-    let start = xml.find("<host ")?;
-    let end = xml[start..].find("</host>")? + start + "</host>".len();
-    let host_xml = &xml[start..end];
-    parse_host_xml(host_xml)
+/// Parse the full nmap XML output and extract all live hosts.
+fn parse_nmap_xml(xml: &str) -> Vec<LanDevice> {
+    let mut devices = Vec::new();
+    let mut search_from = 0;
+
+    while let Some(start) = xml[search_from..].find("<host ").map(|p| p + search_from) {
+        if let Some(end_rel) = xml[start..].find("</host>") {
+            let end = start + end_rel + "</host>".len();
+            let host_xml = &xml[start..end];
+            if let Some(device) = parse_host_xml(host_xml) {
+                devices.push(device);
+            }
+            search_from = end;
+        } else {
+            break;
+        }
+    }
+
+    devices
 }
 
 fn parse_host_xml(xml: &str) -> Option<LanDevice> {
-    // Quick-and-dirty attribute extractor (no full XML parser dep needed)
-    fn attr<'a>(xml: &'a str, tag: &str, attr_name: &str) -> Option<String> {
-        let tag_start = xml.find(&format!("<{}", tag))?;
-        let tag_body_start = tag_start;
-        let tag_end = xml[tag_body_start..].find('>')?;
-        let tag_str = &xml[tag_body_start..tag_body_start + tag_end + 1];
-
-        let search = format!("{}=\"", attr_name);
-        let val_start = tag_str.find(&search)? + search.len();
-        let val_end = tag_str[val_start..].find('"')?;
-        Some(tag_str[val_start..val_start + val_end].to_string())
-    }
-
-    fn attr_in<'a>(xml: &'a str, addrtype: &str, return_attr: &str) -> Option<String> {
+    fn attr_in(xml: &str, addrtype: &str, return_attr: &str) -> Option<String> {
         // Find <address addrtype="..." ... return_attr="..."/>
         let mut search_from = 0;
         while let Some(pos) = xml[search_from..].find("<address ") {
@@ -334,18 +309,19 @@ fn parse_host_xml(xml: &str) -> Option<LanDevice> {
     }
 
     // Must be "up"
-    let status_state = attr(xml, "status ", "state")
-        .or_else(|| {
-            // <status state="up" .../>
-            let s = xml.find("<status ")?;
-            let e = xml[s..].find('>')?;
-            let t = &xml[s..s + e + 1];
-            let ss = "state=\"";
-            let vs = t.find(ss)? + ss.len();
-            let ve = t[vs..].find('"')?;
-            Some(t[vs..vs + ve].to_string())
-        })
-        .unwrap_or_default();
+    let status_state = {
+        // parse: <status state="up" .../>
+        xml.find("<status ")
+            .and_then(|s| {
+                let e = xml[s..].find('>')?;
+                let t = &xml[s..s + e + 1];
+                let ss = "state=\"";
+                let vs = t.find(ss)? + ss.len();
+                let ve = t[vs..].find('"')?;
+                Some(t[vs..vs + ve].to_string())
+            })
+            .unwrap_or_default()
+    };
 
     if status_state != "up" {
         return None;
