@@ -460,8 +460,20 @@ export default function FirewallPage() {
 
       {/* ── Error ─────────────────────────────────────────────────── */}
       {error && (
-        <div style={{ padding: "7px 16px", background: "rgba(220,53,69,0.08)", borderBottom: "1px solid rgba(220,53,69,0.2)", fontSize: 11, color: "#dc3545", flexShrink: 0 }}>
-          {error}
+        <div style={{ padding: "8px 16px", background: "rgba(220,53,69,0.08)", borderBottom: "1px solid rgba(220,53,69,0.2)", fontSize: 11, color: "#dc3545", flexShrink: 0 }}>
+          <div>{error}</div>
+          {(error.includes("password") || error.includes("sudo")) && (
+            <div style={{ marginTop: 5, color: "var(--text-secondary)", fontSize: 10 }}>
+              💡 UFW membutuhkan passwordless sudo. Jalankan di terminal:{" "}
+              <code style={{ background: "var(--surface-3)", padding: "1px 5px", borderRadius: 3, color: "var(--text-primary)" }}>
+                echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/ufw" | sudo tee /etc/sudoers.d/ncp-ufw
+              </code>
+              {" "}kemudian{" "}
+              <code style={{ background: "var(--surface-3)", padding: "1px 5px", borderRadius: 3, color: "var(--text-primary)" }}>
+                sudo chmod 440 /etc/sudoers.d/ncp-ufw
+              </code>
+            </div>
+          )}
         </div>
       )}
 
