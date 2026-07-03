@@ -23,6 +23,7 @@ import WifiAnalyzerPage from "../../pages/WifiAnalyzerPage";
 import TrafficMonitorPage from "../../pages/TrafficMonitorPage";
 import VlanPage from "../../pages/VlanPage";
 import PacketCapturePage from "../../pages/PacketCapturePage";
+import FirewallPage from "../../pages/FirewallPage";
 import ComingSoonPage from "../shared/ComingSoonPage";
 
 function PageContent() {
@@ -45,6 +46,7 @@ function PageContent() {
     case "traffic_monitor": return <TrafficMonitorPage />;
     case "vlan":            return <VlanPage />;
     case "packet_capture":  return <PacketCapturePage />;
+    case "firewall":         return <FirewallPage />;
     default:            return <ComingSoonPage pageName={selectedPage} />;
   }
 }

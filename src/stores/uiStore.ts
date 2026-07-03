@@ -16,7 +16,8 @@ export type SelectedPage =
   | "wifi_analyzer"
   | "traffic_monitor"
   | "vlan"
-  | "packet_capture";
+  | "packet_capture"
+  | "firewall";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 
