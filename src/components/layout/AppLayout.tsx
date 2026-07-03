@@ -24,6 +24,7 @@ import TrafficMonitorPage from "../../pages/TrafficMonitorPage";
 import VlanPage from "../../pages/VlanPage";
 import PacketCapturePage from "../../pages/PacketCapturePage";
 import FirewallPage from "../../pages/FirewallPage";
+import BandwidthMonitorPage from "../../pages/BandwidthMonitorPage";
 import ComingSoonPage from "../shared/ComingSoonPage";
 
 function PageContent() {
@@ -47,6 +48,7 @@ function PageContent() {
     case "vlan":            return <VlanPage />;
     case "packet_capture":  return <PacketCapturePage />;
     case "firewall":         return <FirewallPage />;
+    case "bandwidth_monitor": return <BandwidthMonitorPage />;
     default:            return <ComingSoonPage pageName={selectedPage} />;
   }
 }

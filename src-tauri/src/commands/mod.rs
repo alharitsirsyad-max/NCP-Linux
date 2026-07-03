@@ -1,4 +1,5 @@
 pub mod adapter;
+pub mod bandwidth_monitor;
 pub mod diagnostics;
 pub mod dns_benchmark;
 pub mod firewall;

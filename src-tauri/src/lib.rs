@@ -7,6 +7,7 @@ use commands::wol::{send_wol, save_wol_targets, load_wol_targets, validate_mac};
 use commands::wifi_analyzer::{scan_wifi_networks, check_wifi_available};
 use commands::traffic_monitor::{start_traffic_monitor, get_traffic_history, stop_traffic_monitor, list_traffic_interfaces};
 use commands::vlan::get_vlan_info;
+use commands::bandwidth_monitor::{check_nethogs_available, start_bandwidth_monitor, stop_bandwidth_monitor};
 use commands::firewall::{detect_firewall, get_ufw_status, get_ufw_rules, ufw_allow, ufw_deny, ufw_delete_rule, ufw_enable, ufw_disable, ufw_reset};
 use commands::packet_capture::{check_tcpdump_available, check_wireshark_available, start_capture, stop_capture, open_in_wireshark, expand_capture_path};
 use commands::dns_benchmark::{get_isp_dns, run_dns_benchmark, get_default_dns_servers};
@@ -74,6 +75,9 @@ pub fn run() {
             stop_traffic_monitor,
             list_traffic_interfaces,
             get_vlan_info,
+            check_nethogs_available,
+            start_bandwidth_monitor,
+            stop_bandwidth_monitor,
             detect_firewall,
             get_ufw_status,
             get_ufw_rules,

@@ -95,8 +95,9 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "traffic_monitor", icon: <Activity size={14} />,    label: "Traffic Monitor" },
   { id: "vlan",            icon: <Network size={14} />,     label: "VLAN Info" },
   { id: "packet_capture",  icon: <Radio size={14} />,       label: "Packet Capture" },
-  { id: "firewall",        icon: <Shield size={14} />,      label: "Firewall" },
-  { id: "settings",        icon: <Settings size={14} />,    label: "Settings" },
+  { id: "firewall",          icon: <Shield size={14} />,      label: "Firewall" },
+  { id: "bandwidth_monitor", icon: <Activity size={14} />,   label: "Bandwidth/Process" },
+  { id: "settings",          icon: <Settings size={14} />,   label: "Settings" },
 ];
 
 interface ContextMenuState {
