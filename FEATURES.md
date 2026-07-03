@@ -946,7 +946,7 @@ Grafik realtime download/upload per interface dengan history.
 ### Stats Cards
 - Current Download / Upload speed
 - Session RX / TX bytes (sejak monitoring dimulai)
-- Total interface bytes sejak boot
+- Total interface bytes sejak boot.
 
 ### Kontrol
 - Dropdown pilih interface
