@@ -31,6 +31,19 @@ Dokumentasi lengkap semua fitur dan fungsi aplikasi Network Control Panel (NCP).
 23. [Settings](#23-settings)
 24. [Keyboard Shortcuts](#24-keyboard-shortcuts)
 25. [Properties Popup](#25-properties-popup)
+26. [Speed Test](#26-speed-test)
+27. [LAN Scanner](#27-lan-scanner)
+28. [DNS Benchmark](#28-dns-benchmark)
+29. [Wake-on-LAN](#29-wake-on-lan)
+30. [Wi-Fi Analyzer](#30-wi-fi-analyzer)
+31. [Traffic Monitor](#31-traffic-monitor)
+32. [VLAN Info](#32-vlan-info)
+33. [Packet Capture](#33-packet-capture)
+34. [Firewall Manager](#34-firewall-manager)
+35. [Bandwidth Monitor per Process](#35-bandwidth-monitor-per-process)
+23. [Settings](#23-settings)
+24. [Keyboard Shortcuts](#24-keyboard-shortcuts)
+25. [Properties Popup](#25-properties-popup)
 
 ---
 
@@ -738,7 +751,327 @@ Semua command terdaftar dan dipanggil via Tauri IPC `invoke()`:
 | `check_speedtest_available` | Cek apakah `speedtest-cli` tersedia di sistem |
 | `run_speedtest` | Jalankan speed test via `speedtest-cli --json`, streaming progress events |
 | `run_nmcli_command` | Generic nmcli wrapper (connection/device/radio/networking) |
+| `check_nmap_available` | Cek apakah `nmap` tersedia |
+| `get_local_networks` | Deteksi subnet lokal dari `ip -j addr show` |
+| `run_lan_scan` | Scan jaringan via `nmap -sn --oX` + emit events per device |
+| `cancel_lan_scan` | Batalkan scan yang sedang berjalan |
+| `get_default_dns_servers` | Return daftar DNS server publik + ISP DNS dari `/etc/resolv.conf` |
+| `run_dns_benchmark` | Benchmark latency tiap DNS server via `dig`, emit progress per server |
+| `get_isp_dns` | Baca nameserver dari `/etc/resolv.conf` |
+| `send_wol` | Kirim magic packet via UDP broadcast (pure Rust) |
+| `save_wol_targets` | Simpan daftar WoL device ke `~/.local/share/network.control.panel/wol_targets.json` |
+| `load_wol_targets` | Load daftar WoL device dari disk |
+| `validate_mac` | Validasi format MAC address |
+| `scan_wifi_networks` | Scan Wi-Fi via `nmcli device wifi list`, parse output |
+| `check_wifi_available` | Cek apakah ada adapter Wi-Fi |
+| `list_traffic_interfaces` | List interface dari `/proc/net/dev` |
+| `start_traffic_monitor` | Mulai polling `/proc/net/dev` tiap detik, emit `traffic_update` events |
+| `get_traffic_history` | Return history buffer traffic per interface |
+| `stop_traffic_monitor` | Hentikan monitoring traffic |
+| `get_vlan_info` | List VLAN interface via `ip -j link show type vlan` |
+| `check_tcpdump_available` | Cek apakah `tcpdump` tersedia |
+| `check_wireshark_available` | Cek apakah `wireshark` tersedia |
+| `start_capture` | Mulai capture via `sudo tcpdump`, emit `capture_progress` tiap detik |
+| `stop_capture` | Hentikan tcpdump, return path file output |
+| `open_in_wireshark` | Buka file `.pcap` di Wireshark |
+| `expand_capture_path` | Expand `~/` ke path absolut |
+| `detect_firewall` | Deteksi backend firewall: ufw / nftables / iptables / none |
+| `get_ufw_status` | Ambil status UFW (active, default policies, logging) |
+| `get_ufw_rules` | Ambil daftar rules UFW dengan nomor |
+| `ufw_allow` | Tambah rule ALLOW (e.g. `80/tcp`) |
+| `ufw_deny` | Tambah rule DENY |
+| `ufw_delete_rule` | Hapus rule by nomor |
+| `ufw_enable` | Aktifkan UFW |
+| `ufw_disable` | Nonaktifkan UFW |
+| `ufw_reset` | Reset semua rules UFW |
+| `check_nethogs_available` | Cek apakah `nethogs` tersedia |
+| `start_bandwidth_monitor` | Mulai `sudo nethogs -t`, parse output, emit `bandwidth_update` |
+| `stop_bandwidth_monitor` | Hentikan nethogs |
 
 ---
 
-*Network Control Panel v0.1.0 — Built with Tauri v2, React 19, TypeScript, Rust*
+## 26. Speed Test
+
+**Lokasi:** Sidebar → Speed Test
+
+Mengukur kecepatan internet menggunakan `speedtest-cli`.
+
+### Tampilan
+- Tiga gauge: **Ping** (ms), **Download** (Mbps), **Upload** (Mbps)
+- Progress bar dengan warna per stage: oranye=ping, biru=download, hijau=upload
+- Info server dan ISP muncul setelah test selesai
+- "Last result" bar menampilkan hasil terakhir dengan timestamp
+
+### Kontrol
+- **START TEST** → mulai test, berubah jadi **STOP** (merah) saat berjalan
+- **STOP** → hentikan, kembali ke idle
+
+**Command:** `speedtest-cli --json --secure`
+
+> Install: `sudo pacman -S speedtest-cli` atau `sudo apt install speedtest-cli`
+
+---
+
+## 27. LAN Scanner
+
+**Lokasi:** Sidebar → LAN Scanner
+
+Scan semua perangkat aktif di jaringan lokal menggunakan `nmap`.
+
+### Tampilan
+- Dropdown network: otomatis terisi dari `get_local_networks()`
+- Disclaimer banner kuning permanen (pengingat legal)
+- Tabel realtime — row ditambah satu per satu saat device ditemukan
+- Kolom: IP Address, MAC Address, Vendor, Hostname, Latency
+
+### Context Menu per Row
+- Copy IP / Copy MAC
+- Ping device → buka Diagnostics pre-fill
+- Traceroute → buka Diagnostics tab Traceroute
+- SSH to device → buka SSH Quick Connect
+- Add to Wake-on-LAN → buka WoL page pre-fill MAC
+
+### Kontrol
+- Tombol **Start Scan** / **Stop**
+- Tombol **Export** → simpan ke TXT di `~/Downloads`
+- Info jika MAC tidak tersedia (butuh sudo untuk `nmap -sn`)
+
+**Command:** `sudo nmap -sn --oX - {network}` (fallback tanpa sudo)
+
+> Install: `sudo pacman -S nmap` atau `sudo apt install nmap`
+
+---
+
+## 28. DNS Benchmark
+
+**Lokasi:** Sidebar → DNS Benchmark
+
+Bandingkan latency berbagai DNS server menggunakan `dig`.
+
+### Server yang ditest (default)
+- Cloudflare (1.1.1.1), Cloudflare Alt (1.0.0.1)
+- Google (8.8.8.8), Google Alt (8.8.4.4)
+- Quad9 (9.9.9.9)
+- OpenDNS (208.67.222.222)
+- AdGuard (94.140.14.14)
+- ISP DNS (otomatis dari `/etc/resolv.conf`)
+- Custom server: bisa ditambah manual
+
+### Tampilan
+- Progress row: server sedang ditest + query counter `X/N`
+- Tabel hasil realtime (muncul row per row):
+  - Rank: 🥇🥈🥉 untuk 3 terbaik
+  - Bar chart proporsional, warna HSL green→yellow→red
+  - Success rate per server
+- Klik row → expand detail: tiap query latency individual, min/max/avg
+- Banner rekomendasi di bawah setelah selesai
+
+### Konfigurasi
+- Test domain (default: `google.com`)
+- Query count per server: 3, 5, 10
+- Tambah/hapus custom DNS server
+
+**Command:** `dig @{server_ip} {domain} +time=3 +tries=1 +noall +stats`
+
+---
+
+## 29. Wake-on-LAN
+
+**Lokasi:** Sidebar → Wake-on-LAN
+
+Kirim magic packet untuk menyalakan perangkat lain di jaringan.
+
+### Saved Devices
+- Daftar device yang disimpan ke disk (`~/.local/share/network.control.panel/wol_targets.json`)
+- Tombol **Wake** per device → kirim magic packet + toast konfirmasi
+- Tombol Delete
+- Tombol **Add Device** → modal form: Name, MAC, Broadcast IP, Port
+
+### Quick Wake
+- Input MAC address langsung + kirim tanpa menyimpan
+- Validasi format MAC sebelum kirim
+
+### Magic Packet
+- Implementasi pure Rust — tidak butuh binary eksternal
+- Format: 6×0xFF + MAC×16 = 102 bytes
+- Dikirim via UDP ke `{broadcast}:{port}` (default port 9)
+
+### Integrasi LAN Scanner
+- Context menu LAN Scanner → "Add to Wake-on-LAN" → buka modal dengan MAC pre-filled
+
+---
+
+## 30. Wi-Fi Analyzer
+
+**Lokasi:** Sidebar → Wi-Fi Analyzer
+
+Tampilkan semua jaringan Wi-Fi di sekitar beserta detail teknisnya.
+
+### Kolom Tabel
+| Kolom | Deskripsi |
+|---|---|
+| SSID | Nama jaringan (✅ = currently connected) |
+| Signal | Bar 5 kotak + persentase, warna: hijau/kuning/merah |
+| Channel | Nomor channel |
+| Band | Badge berwarna: 2.4 GHz (oranye) / 5 GHz (biru) / 6 GHz (ungu) |
+| Security | Badge: WPA3 (hijau), WPA2 (biru), WEP (oranye), Open ⚠ (merah) |
+| BSSID | MAC address access point |
+
+### Channel Usage Chart
+- Bar horizontal per channel
+- Merah + label "crowded!" jika ≥2 network di channel yang sama
+- Terpisah per band (2.4 GHz / 5 GHz)
+
+### Kontrol
+- Tombol **Scan** + auto-scan saat halaman dibuka
+- Fallback informatif jika tidak ada adapter Wi-Fi
+
+**Command:** `nmcli -t -f IN-USE,BSSID,SSID,MODE,CHAN,FREQ,SIGNAL,SECURITY device wifi list`
+
+---
+
+## 31. Traffic Monitor
+
+**Lokasi:** Sidebar → Traffic Monitor
+
+Grafik realtime download/upload per interface dengan history.
+
+### Grafik
+- SVG native (tanpa library eksternal)
+- Download (biru) + Upload (hijau), area fill semi-transparan
+- Auto-scale Y-axis dengan format KB/s atau MB/s
+- X-axis: timestamp HH:MM:SS
+- Toggle durasi: **1m** / **5m** / **1h**
+
+### Stats Cards
+- Current Download / Upload speed
+- Session RX / TX bytes (sejak monitoring dimulai)
+- Total interface bytes sejak boot
+
+### Kontrol
+- Dropdown pilih interface
+- Indikator "Live" dengan dot animasi
+- Auto-mulai saat interface dipilih
+
+**Data source:** `/proc/net/dev`, polling setiap 1 detik
+
+---
+
+## 32. VLAN Info
+
+**Lokasi:** Sidebar → VLAN Info
+
+Tampilkan semua VLAN sub-interface yang terkonfigurasi di sistem.
+
+### Kolom
+| Kolom | Deskripsi |
+|---|---|
+| Interface | Nama VLAN interface (e.g. `eth0.10`) |
+| VLAN ID | ID numerik (badge biru) |
+| Parent | Interface fisik induk |
+| IP Address | Alamat IP jika terkonfigurasi |
+| MAC | MAC address |
+| Status | Badge UP (hijau) / DOWN (abu) |
+
+### Empty State
+Jika tidak ada VLAN: tampilkan penjelasan VLAN + 3 cara membuat (nmcli, ip link, nm-connection-editor) lengkap dengan contoh command.
+
+**Command:** `ip -j link show type vlan` + `ip -j addr show`
+
+---
+
+## 33. Packet Capture
+
+**Lokasi:** Sidebar → Packet Capture
+
+Capture paket jaringan tanpa perlu membuka Wireshark.
+
+### Konfigurasi
+- **Interface**: dropdown semua interface
+- **BPF Filter**: input teks + quick-pick buttons (HTTP, HTTPS, DNS, TCP, UDP, ICMP, No SSH, host)
+- **Output file**: path `.pcap` dengan tombol Browse
+- **Stop condition**: Manual / Setelah N packets / Setelah N seconds (dengan countdown)
+
+### Status & Progress
+- Packets captured (estimasi dari file size)
+- File size realtime
+- Elapsed time
+
+### Tombol "Open in Wireshark"
+Muncul setelah capture selesai jika Wireshark terinstall.
+
+### BPF Filter Reference
+Panel referensi built-in dengan contoh: `port 80`, `host 8.8.8.8`, `tcp`, `not port 22`, dll.
+
+**Command:** `sudo tcpdump -n -i {iface} -w {output.pcap} [{filter}] [-c {count}]`
+
+> Requires: `sudo tcpdump` (passwordless sudo recommended)
+
+---
+
+## 34. Firewall Manager
+
+**Lokasi:** Sidebar → Firewall
+
+GUI untuk melihat dan mengelola rules firewall UFW.
+
+### Status Header
+- Badge ACTIVE (hijau) / INACTIVE (merah)
+- Default incoming/outgoing policy
+- Logging level
+
+### Rules Table
+| Kolom | Deskripsi |
+|---|---|
+| # | Nomor rule |
+| To | Port/service tujuan |
+| Action | Badge ALLOW (hijau) / DENY (merah) |
+| From | Sumber traffic |
+| Protocol | TCP / UDP |
+
+### Aksi
+- **Add Rule** → modal: pilih port, protocol (TCP/UDP/Any), action (ALLOW/DENY)
+- **Delete Rule** → konfirmasi dialog wajib
+- **Enable/Disable Firewall** → konfirmasi dialog wajib
+
+> ⚠️ **Semua aksi destruktif** (delete, disable) wajib melalui confirm dialog.
+
+### Fallback
+- Jika nftables/iptables terdeteksi → info install UFW
+- Jika tidak ada firewall → instruksi install + enable
+
+**Commands:** `sudo ufw status verbose/numbered`, `sudo ufw allow/deny/delete/enable/disable`
+
+---
+
+## 35. Bandwidth Monitor per Process
+
+**Lokasi:** Sidebar → Bandwidth/Process
+
+Tampilkan proses mana yang paling banyak menggunakan bandwidth, realtime.
+
+### Tabel
+| Kolom | Deskripsi |
+|---|---|
+| Process | Nama proses + path |
+| PID | Process ID |
+| Download ↓ | Receive rate (KB/s atau MB/s) |
+| Upload ↑ | Send rate |
+| Bar | Bar chart proporsional (biru=download, hijau=upload) |
+
+### Perilaku
+- Update realtime setiap nethogs refresh (~1 detik)
+- Diurutkan berdasarkan total bandwidth tertinggi
+- Hanya proses dengan traffic aktif yang ditampilkan
+- Total aggregate ↓/↑ di header toolbar
+
+### Kontrol
+- Dropdown pilih interface
+- Tombol **Start** / **Stop**
+
+**Command:** `sudo nethogs -t -d 1 {iface}`
+
+> Install: `sudo pacman -S nethogs` atau `sudo apt install nethogs`  
+> Requires: passwordless sudo untuk nethogs
+
+---

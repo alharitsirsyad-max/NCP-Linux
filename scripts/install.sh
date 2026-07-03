@@ -10,7 +10,7 @@ set -e
 # ── Config ────────────────────────────────────────────────────
 APP_NAME="network-control-panel"
 APP_DISPLAY_NAME="Network Control Panel"
-APP_VERSION="0.1.0"
+APP_VERSION="0.2.0"
 GITHUB_REPO="alharitsirsyad-max/NCP-Linux"
 GITHUB_RELEASE_URL="https://github.com/${GITHUB_REPO}/releases/latest/download"
 INSTALL_DIR="${HOME}/.local/bin"
@@ -57,7 +57,7 @@ install_deps() {
 
     case "$DISTRO" in
         arch|manjaro|endeavouros)
-            DEPS="networkmanager iproute2 iputils wireshark-qt mtr whois traceroute bind"
+            DEPS="networkmanager iproute2 iputils wireshark-qt mtr whois traceroute bind nmap tcpdump nethogs ufw speedtest-cli"
             INSTALLED=()
             MISSING=()
             for pkg in $DEPS; do
@@ -75,17 +75,17 @@ install_deps() {
             fi
             ;;
         ubuntu|debian|linuxmint|pop)
-            DEPS="network-manager iproute2 iputils-ping wireshark mtr-tiny whois traceroute bind9-dnsutils"
+            DEPS="network-manager iproute2 iputils-ping wireshark mtr-tiny whois traceroute bind9-dnsutils nmap tcpdump nethogs ufw speedtest-cli"
             info "Updating package lists..."
             sudo apt-get update -qq
             sudo apt-get install -y $DEPS || warn "Some packages failed to install"
             ;;
         fedora|rhel|centos)
-            DEPS="NetworkManager iproute iputils wireshark-cli mtr whois traceroute bind-utils"
+            DEPS="NetworkManager iproute iputils wireshark-cli mtr whois traceroute bind-utils nmap tcpdump nethogs ufw speedtest-cli"
             sudo dnf install -y $DEPS || warn "Some packages failed to install"
             ;;
         opensuse*)
-            DEPS="NetworkManager iproute2 iputils wireshark mtr whois traceroute bind-utils"
+            DEPS="NetworkManager iproute2 iputils wireshark mtr whois traceroute bind-utils nmap tcpdump nethogs ufw speedtest-cli"
             sudo zypper install -y $DEPS || warn "Some packages failed to install"
             ;;
         *)
@@ -264,10 +264,18 @@ main() {
     echo -e "  Or from terminal:     ${APP_NAME}"
     echo ""
     echo -e "  Required tools (install if missing):"
-    echo -e "    • wireshark    — packet capture"
+    echo -e "    • nmap         — LAN scanner"
+    echo -e "    • tcpdump      — packet capture (needs sudo)"
+    echo -e "    • nethogs      — bandwidth per process (needs sudo)"
+    echo -e "    • ufw          — firewall manager"
+    echo -e "    • speedtest-cli — speed test"
+    echo -e "    • wireshark    — open .pcap captures"
     echo -e "    • mtr          — MTR diagnostics"
     echo -e "    • whois        — domain lookup"
     echo -e "    • dig          — DNS lookup"
+    echo ""
+    echo -e "  Sudo setup (for nmap/tcpdump/nethogs/ufw):"
+    echo -e "    See README.md → Sudo Requirements"
     echo ""
 }
 
