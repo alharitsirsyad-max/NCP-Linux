@@ -62,9 +62,10 @@ pub async fn get_local_networks() -> Result<Vec<LocalNetwork>, String> {
         .args(["-j", "route", "show"])
         .output()
         .await
-        .unwrap_or_default();
-    let routes: serde_json::Value =
-        serde_json::from_slice(&route_output.stdout).unwrap_or(serde_json::json!([]));
+        .ok();
+    let routes: serde_json::Value = route_output
+        .and_then(|o| serde_json::from_slice(&o.stdout).ok())
+        .unwrap_or(serde_json::json!([]));
 
     let mut networks: Vec<LocalNetwork> = Vec::new();
 
