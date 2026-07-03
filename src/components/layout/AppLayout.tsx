@@ -20,6 +20,7 @@ import LanScannerPage from "../../pages/LanScannerPage";
 import DnsBenchmarkPage from "../../pages/DnsBenchmarkPage";
 import WolPage from "../../pages/WolPage";
 import WifiAnalyzerPage from "../../pages/WifiAnalyzerPage";
+import TrafficMonitorPage from "../../pages/TrafficMonitorPage";
 import ComingSoonPage from "../shared/ComingSoonPage";
 
 function PageContent() {
@@ -39,6 +40,7 @@ function PageContent() {
     case "dns_benchmark": return <DnsBenchmarkPage />;
     case "wol":           return <WolPage />;
     case "wifi_analyzer": return <WifiAnalyzerPage />;
+    case "traffic_monitor": return <TrafficMonitorPage />;
     default:            return <ComingSoonPage pageName={selectedPage} />;
   }
 }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Wifi, Monitor, Shield, Container,
   Stethoscope, Route, Table, DoorOpen,
-  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch, BarChart2, PowerOff,
+  Loader, AlertCircle, Network, Settings, Terminal, Zap, ScanSearch, BarChart2, PowerOff, Activity,
 } from "lucide-react";
 import { useAdapters } from "../../hooks/useAdapters";
 import { mockAdapters } from "../../mock/adapters";
@@ -91,8 +91,9 @@ const TOOLS: { id: SelectedPage; icon: React.ReactNode; label: string }[] = [
   { id: "lan_scanner",   icon: <ScanSearch size={14} />,  label: "LAN Scanner" },
   { id: "dns_benchmark", icon: <BarChart2 size={14} />,   label: "DNS Benchmark" },
   { id: "wol",           icon: <PowerOff size={14} />,    label: "Wake-on-LAN" },
-  { id: "wifi_analyzer", icon: <Wifi size={14} />,        label: "Wi-Fi Analyzer" },
-  { id: "settings",      icon: <Settings size={14} />,    label: "Settings" },
+  { id: "wifi_analyzer",   icon: <Wifi size={14} />,        label: "Wi-Fi Analyzer" },
+  { id: "traffic_monitor", icon: <Activity size={14} />,    label: "Traffic Monitor" },
+  { id: "settings",        icon: <Settings size={14} />,    label: "Settings" },
 ];
 
 interface ContextMenuState {

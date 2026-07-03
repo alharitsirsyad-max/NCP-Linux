@@ -13,7 +13,8 @@ export type SelectedPage =
   | "lan_scanner"
   | "dns_benchmark"
   | "wol"
-  | "wifi_analyzer";
+  | "wifi_analyzer"
+  | "traffic_monitor";
 
 export type DiagnosticsTab = "ping" | "traceroute" | "mtr" | "dns" | "whois" | "calculator";
 

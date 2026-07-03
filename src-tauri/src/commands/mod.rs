@@ -4,5 +4,6 @@ pub mod dns_benchmark;
 pub mod lan_scanner;
 pub mod network_tables;
 pub mod speedtest;
+pub mod traffic_monitor;
 pub mod wifi_analyzer;
 pub mod wol;
